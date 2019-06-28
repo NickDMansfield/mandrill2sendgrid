@@ -1,0 +1,26 @@
+{
+  "name": "mandrill2sendgrid",
+  "version": "0.0.1",
+  "description": "Automatically converts Mailchimp/Mandrill templates to Sendgrid templates.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NickDMansfield/mandrill2sendgrid.git"
+  },
+  "keywords": [
+    "mandrill",
+    "email",
+    "sendgrid",
+    "conversion",
+    "CLI"
+  ],
+  "author": "Nicholas Mansfield",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NickDMansfield/mandrill2sendgrid/issues"
+  },
+  "homepage": "https://github.com/NickDMansfield/mandrill2sendgrid#readme"
+}
