@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/NickDMansfield/mandrill2sendgrid/issues"
   },
-  "homepage": "https://github.com/NickDMansfield/mandrill2sendgrid#readme"
+  "homepage": "https://github.com/NickDMansfield/mandrill2sendgrid#readme",
+  "dependencies": {
+    "lodash": "^4.17.11"
+  }
 }

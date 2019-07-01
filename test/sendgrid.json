@@ -1,0 +1,44 @@
+{
+  "personalizations": [
+    {
+      "to": [
+        {
+          "email": "recipient.email@example.com",
+          "name": "Recipient Name"
+        }
+      ]
+    }
+  ],
+  "from": {
+    "email": "message.from_email@example.com",
+    "name": "Example Name"
+  },
+  "reply_to": {
+    "email": "message.reply@example.com",
+    "name": ""
+  },
+  "content": [
+    {
+      "type": "text/html",
+      "value": "<p>Example HTML content</p>"
+    },
+    {
+      "type": "text/plain",
+      "value": "Example text content"
+    }
+  ],
+  "mail_settings": {
+    "bcc": {
+      "enable": true,
+      "email": "message.bcc_address@example.com"
+    }
+  },
+  "subject": "example subject",
+  "headers": {
+    "Reply-To": "message.reply@example.com"
+  },
+  "categories": [
+    "password-resets"
+  ],
+  "send_at": "example send_at"
+}
