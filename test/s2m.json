@@ -1,0 +1,55 @@
+{
+  "send_at": "example send_at",
+  "message": {
+    "to": [
+      {
+        "email": "recipient.email@example.com",
+        "name": "Recipient Name"
+      },
+      {
+        "email": "recipient2.email@example.com",
+        "name": "Recipient Name2"
+      }
+    ],
+    "merge": true,
+    "global_merge_vars": [
+      {
+        "name": "merge1",
+        "content": "merge1 content"
+      }
+    ],
+    "merge_vars": [
+      {
+        "rcpt": "recipient.email@example.com",
+        "vars": [
+          {
+            "name": "merge2",
+            "content": "merge2 content"
+          },
+          {
+            "name": "merge2-b",
+            "content": "merge2 content-b"
+          }
+        ]
+      },
+      {
+        "rcpt": "recipient2.email@example.com",
+        "vars": [
+          {
+            "name": "merger2v",
+            "content": "merger2v content"
+          }
+        ]
+      }
+    ],
+    "from_email": "message.from_email@example.com",
+    "from_name": "Example Name",
+    "headers": {
+      "Reply-To": "message.reply@example.com"
+    },
+    "subject": "example subject",
+    "categories": [
+      "password-resets"
+    ]
+  }
+}

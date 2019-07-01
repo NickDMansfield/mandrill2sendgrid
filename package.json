@@ -4,7 +4,7 @@
   "description": "Automatically converts Mailchimp/Mandrill templates to Sendgrid templates.",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "index.js"
   },
   "repository": {
     "type": "git",

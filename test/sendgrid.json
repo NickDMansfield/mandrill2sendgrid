@@ -6,7 +6,24 @@
           "email": "recipient.email@example.com",
           "name": "Recipient Name"
         }
-      ]
+      ],
+      "dynamic_template_data": {
+        "merge1": "merge1 content",
+        "merge2": "merge2 content",
+        "merge2-b": "merge2 content-b"
+      }
+    },
+    {
+      "to": [
+        {
+          "email": "recipient2.email@example.com",
+          "name": "Recipient Name2"
+        }
+      ],
+      "dynamic_template_data": {
+        "merge1": "merge1 content",
+        "merger2v": "merger2v content"
+      }
     }
   ],
   "from": {

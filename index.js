@@ -21,9 +21,24 @@ const fileLoaded = function(fileStringData) {
     if (err) {
       console.log('Error while writing.  ' + err);
     } else {
-        console.log('Writing finished');
+        console.log('M -> SG Writing finished');
+        fs.writeFile('./test/s2m.json', JSON.stringify(sendgridToMandrill(sendgridTemplate), 0, 2), function(err) {
+          if (err) {
+            console.log('Error converting sendgrid to mandrill');
+          } else {
+            console.log('Sendgrid to mandrill conversion complete.');
+          }
+        })
     }
   });
+};
+
+const mandrillVarsToSendGrid = function (mandrillVars) {
+  const ret = {};
+  _.forEach(mandrillVars, mv => {
+    ret[mv.name] = mv.content;
+  });
+  return ret;
 };
 
 const mandrillToSendgrid = function(mandrillJSON, objToEdit) {
@@ -85,6 +100,24 @@ const reply = msg.headers['Reply-To'];
     newObj.mail_settings.bcc = { enable: true, email: msg.bcc_address };
   }
 
+  // Build the global merge vars into a generic base object
+  const globalMergeVars = mandrillVarsToSendGrid(msg.global_merge_vars);
+
+  // Map the custom data on a user-basis for assignment in personalizations
+  const userMergeVars = {};
+  _.forEach(msg.merge_vars, mv => {
+    if (mv.rcpt) {
+      userMergeVars[mv.rcpt] = mandrillVarsToSendGrid(mv.vars);
+    }
+  });
+
+  // Assigns the dynamic template data to each recipient
+  _.forEach(newObj.personalizations, p => {
+    // We use a hard [0] because presently each personalization is tied to one 'to'
+    const newDTData = _.assign(p.dynamic_template_data || {}, globalMergeVars, userMergeVars[p.to[0].email]);
+    p.dynamic_template_data = newDTData;
+  });
+
   newObj.subject = msg.subject;
   newObj.headers = msg.headers;
   newObj.categories = msg.tags;
@@ -96,28 +129,60 @@ const reply = msg.headers['Reply-To'];
 const sendgridToMandrill = function(sendgridJSON, objToEdit) {
   const newObj = objToEdit || {};
   const msg = newObj.message || {};
+  let globalMergeVars = msg.global_merge_vars || [];
+  let mergeVars = msg.merge_vars || [];
+  let tempMergeVars = [];
 
   msg.to = msg.to || [];
   _.forEach(sendgridJSON.personalizations, p => {
     _.forEach(p.to, to => {
       if (!_.find(msg.to, t => { t.email === to.email })) {
         msg.to.push({ email: to.email, name: to. name });
+        _.forIn(p.dynamic_template_data, (key, value) => {
+          tempMergeVars.push({ rcpt: to.email, name: value, content: key });
+        });
       }
     });
   });
 
+  _.forEach(tempMergeVars, tmv => {
+    if (!tmv || _.find(globalMergeVars, gmv => { return gmv.name === tmv.name})) {
+      return;
+    }
+    if (tempMergeVars.filter(_tmv =>  _tmv.content === tmv.content && _tmv.name === tmv.name).length === msg.to.length) {
+      globalMergeVars.push({ name: tmv.name, content: tmv.content });
+    } else {
+      let rcptData = _.find(mergeVars, mv =>  mv.rcpt === tmv.rcpt );
+      if (!rcptData) {
+        rcptData = { rcpt: tmv.rcpt, vars: [] };
+        mergeVars.push(rcptData);
+      }
+      rcptData.vars.push({ name: tmv.name, content: tmv.content});
+    }
+  });
+  if (globalMergeVars || mergeVars) {
+    msg.merge = true;
+    msg.global_merge_vars = globalMergeVars;
+    msg.merge_vars = mergeVars;
+  }
+
   msg.from_email = sendgridJSON.from.email;
   msg.from_name = sendgridJSON.from.name;
 
-  msg.headers['Reply-To'] = sendgridJSON.reply_to.email || sendgridJSON.headers['Reply-To'] || sendgridJSON.from.email;
-
-  const sgHtmlContent = _.find(sendgridJSON.content(c => {  c.type === 'text/html' }));
-  if (sgHtmlContentl) {
-    msg.html = sgHtmlContent.value;
+  if (!msg.headers) {
+    msg.headers = [];
   }
-  const sgTextContent = _.find(sendgridJSON.content(c => {  c.type === 'text/plain' }));
-  if (sgTextContent) {
-    msg.text = sgTextContent.value;
+  msg.headers['Reply-To'] = sendgridJSON.reply_to.email || (sendGridJSON.headers && sendgridJSON.headers['Reply-To']) || sendgridJSON.from.email;
+
+  if (sendgridJSON.content) {
+    const sgHtmlContent = _.find(sendgridJSON.content, c => {  c.type === 'text/html' });
+    if (sgHtmlContent) {
+      msg.html = sgHtmlContent.value;
+    }
+    const sgTextContent = _.find(sendgridJSON.content, c => {  c.type === 'text/plain' });
+    if (sgTextContent) {
+      msg.text = sgTextContent.value;
+    }
   }
 
   if (sendgridJSON.tracking_settings) {
