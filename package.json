@@ -24,6 +24,6 @@
   },
   "homepage": "https://github.com/NickDMansfield/mandrill2sendgrid#readme",
   "dependencies": {
-    "lodash": "^4.17.13"
+    "lodash": "^4.17.19"
   }
 }
